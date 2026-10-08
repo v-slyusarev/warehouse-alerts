@@ -1,9 +1,10 @@
 plugins {
     id 'java-library'
     id 'maven-publish'
+    id 'com.google.protobuf' version '0.9.5'
 }
 
-group = 'com.github.v-slyusarev.warehouse-alerts'
+group = 'com.github.vslyusarev.warehousealerts'
 version = '1.0-SNAPSHOT'
 
 repositories {
@@ -11,13 +12,18 @@ repositories {
 }
 
 dependencies {
-    testImplementation platform('org.junit:junit-bom:6.0.0')
-    testImplementation 'org.junit.jupiter:junit-jupiter'
-    testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
+    api 'com.google.protobuf:protobuf-java:4.33.0'
 }
 
-test {
-    useJUnitPlatform()
+protobuf {
+    protoc {
+        artifact = 'com.google.protobuf:protoc:4.33.0'
+    }
+}
+
+
+java {
+    withSourcesJar()
 }
 
 publishing {
@@ -26,4 +32,9 @@ publishing {
             from components.java
         }
     }
+
+    repositories {
+        mavenLocal()
+    }
 }
+
