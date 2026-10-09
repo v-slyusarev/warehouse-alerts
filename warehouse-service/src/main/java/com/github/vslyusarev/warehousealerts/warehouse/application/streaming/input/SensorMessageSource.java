@@ -1,4 +1,4 @@
-package com.github.vslyusarev.warehousealerts.warehouse.streaming.input;
+package com.github.vslyusarev.warehousealerts.warehouse.application.streaming.input;
 
 import reactor.core.publisher.Flux;
 

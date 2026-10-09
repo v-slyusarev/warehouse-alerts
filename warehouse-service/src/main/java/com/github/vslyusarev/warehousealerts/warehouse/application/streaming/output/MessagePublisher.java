@@ -1,4 +1,4 @@
-package com.github.vslyusarev.warehousealerts.warehouse.streaming.output;
+package com.github.vslyusarev.warehousealerts.warehouse.application.streaming.output;
 
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;

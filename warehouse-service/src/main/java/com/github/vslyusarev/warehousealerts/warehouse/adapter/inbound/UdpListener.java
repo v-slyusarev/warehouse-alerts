@@ -1,23 +1,25 @@
 package com.github.vslyusarev.warehousealerts.warehouse.adapter.inbound;
 
-import com.github.vslyusarev.warehousealerts.warehouse.streaming.input.SensorMessage;
-import com.github.vslyusarev.warehousealerts.warehouse.streaming.input.SensorMessageSource;
+import com.github.vslyusarev.warehousealerts.warehouse.application.model.SensorType;
+import com.github.vslyusarev.warehousealerts.warehouse.application.streaming.input.SensorMessage;
+import com.github.vslyusarev.warehousealerts.warehouse.application.streaming.input.SensorMessageSource;
 import reactor.core.publisher.Flux;
 import reactor.netty.udp.UdpServer;
 
 import io.netty.channel.socket.DatagramPacket;
 import io.netty.buffer.ByteBuf;
 
-import java.time.Instant;
-import java.time.ZonedDateTime;
-
 public class UdpListener implements SensorMessageSource {
     private final UdpServer udpServer;
+    private final TimeProvider timeProvider;
+    private final SensorType sensorType;
 
-    public UdpListener(int port) {
+    public UdpListener(int port, TimeProvider timeProvider, SensorType sensorType) {
         udpServer = UdpServer.create()
                 .host("0.0.0.0")
                 .port(port);
+        this.timeProvider = timeProvider;
+        this.sensorType = sensorType;
     }
 
     @Override
@@ -26,12 +28,15 @@ public class UdpListener implements SensorMessageSource {
                 .flatMapMany(conn -> conn.inbound().receiveObject()
                         .ofType(DatagramPacket.class)
                         .map(packet -> {
-                                ByteBuf content = packet.content();
-                                byte[] bytes = new byte[content.readableBytes()];
-                                content.getBytes(content.readerIndex(), bytes);
-                                final var addr = packet.sender();
-                                final String sender = addr.getAddress().getHostAddress() + ":" + addr.getPort();
-                                return new SensorMessage(sender, Instant.now(), bytes);
+                            ByteBuf content = packet.content();
+                            byte[] bytes = new byte[content.readableBytes()];
+                            content.getBytes(content.readerIndex(), bytes);
+                            return new SensorMessage(
+                                    packet.sender(),
+                                    timeProvider.getCurrentSystemTimeNano(),
+                                    sensorType,
+                                    bytes
+                            );
                         })
                 );
 

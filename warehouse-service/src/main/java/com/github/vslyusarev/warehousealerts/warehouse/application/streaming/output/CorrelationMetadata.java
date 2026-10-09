@@ -1,4 +1,4 @@
-package com.github.vslyusarev.warehousealerts.warehouse.streaming.output;
+package com.github.vslyusarev.warehousealerts.warehouse.application.streaming.output;
 
 import com.github.vslyusarev.warehousealerts.warehouse.application.model.SensorMeasurement;
 

@@ -5,16 +5,16 @@ import com.github.vslyusarev.warehousealerts.shared.WarehouseMessagePayload;
 import com.github.vslyusarev.warehousealerts.warehouse.infrastructure.config.ConfigProvider;
 import com.github.vslyusarev.warehousealerts.warehouse.application.model.SensorMeasurement;
 import com.github.vslyusarev.warehousealerts.warehouse.application.model.SensorType;
-import com.github.vslyusarev.warehousealerts.warehouse.streaming.output.CorrelationMetadata;
-import com.github.vslyusarev.warehousealerts.warehouse.streaming.output.OutboundMessage;
-import com.github.vslyusarev.warehousealerts.warehouse.streaming.output.OutboundMessageSerializer;
+import com.github.vslyusarev.warehousealerts.warehouse.application.streaming.output.CorrelationMetadata;
+import com.github.vslyusarev.warehousealerts.warehouse.application.streaming.output.OutboundMessage;
+import com.github.vslyusarev.warehousealerts.warehouse.application.streaming.output.OutboundMessageSerializer;
 
 public class ProtobufOutboundMessageSerializer implements OutboundMessageSerializer {
-    private final ConfigProvider configProvider;
+    private final String warehouseId;
     private final ProtobufMapper protobufMapper = new ProtobufMapper();
 
     public ProtobufOutboundMessageSerializer(ConfigProvider configProvider) {
-        this.configProvider = configProvider;
+        warehouseId = configProvider.getWarehouseId();
     }
 
     @Override
@@ -28,14 +28,14 @@ public class ProtobufOutboundMessageSerializer implements OutboundMessageSeriali
 
     private WarehouseMessageKey toWarehouseMessageKey(SensorMeasurement sensorMeasurement) {
         return WarehouseMessageKey.newBuilder()
-                .setWarehouseId(configProvider.getWarehouseId())
+                .setWarehouseId(warehouseId)
                 .setSensorId(sensorMeasurement.sensorId())
                 .build();
     }
 
     private WarehouseMessagePayload toWarehouseMessagePayload(SensorMeasurement sensorMeasurement) {
        return WarehouseMessagePayload.newBuilder()
-                .setWarehouseId(configProvider.getWarehouseId())
+                .setWarehouseId(warehouseId)
                 .setTimestamp(protobufMapper.toProtobufTimestamp(sensorMeasurement.timestamp()))
                 .setSensorType(toProtobufSensorType(sensorMeasurement.sensorType()))
                 .setSensorId(sensorMeasurement.sensorId())

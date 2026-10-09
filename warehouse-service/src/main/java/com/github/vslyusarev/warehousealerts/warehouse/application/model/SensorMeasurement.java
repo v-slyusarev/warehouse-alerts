@@ -8,5 +8,4 @@ public record SensorMeasurement(
     int value,
     Instant timestamp
 ) {
-
 }
