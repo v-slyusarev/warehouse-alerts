@@ -1,6 +1,8 @@
 package com.github.vslyusarev.warehousealerts.warehouse.infrastructure.config;
 
 import com.github.vslyusarev.warehousealerts.warehouse.application.model.SensorType;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -15,6 +17,9 @@ public class AppConfig implements ConfigProvider {
     long samplingIntervalMs;
 
     Map<SensorType, Integer> udpPorts;
+
+    private static final Logger log = LoggerFactory.getLogger(AppConfig.class);
+
 
     public static AppConfig load() throws IOException {
         var properties = new Properties();
@@ -33,6 +38,7 @@ public class AppConfig implements ConfigProvider {
         appConfig.setTopicName(required(properties, "KafkaPublisher.topic").intern());
         appConfig.setUdpPorts(loadUdpPorts(properties));
         appConfig.setSamplingIntervalMs(Long.parseLong(required(properties, "SensorMessageSampler.samplingIntervalMs")));
+        log.info("Config loaded");
         return appConfig;
     }
 

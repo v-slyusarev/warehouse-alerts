@@ -5,6 +5,8 @@ import com.github.vslyusarev.warehousealerts.warehouse.application.streaming.out
 import com.github.vslyusarev.warehousealerts.warehouse.application.streaming.output.MessagePublisher;
 import com.github.vslyusarev.warehousealerts.warehouse.application.streaming.output.OutboundMessage;
 import org.apache.kafka.clients.producer.ProducerRecord;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 import reactor.kafka.sender.KafkaSender;
@@ -18,6 +20,8 @@ public class KafkaPublisher implements MessagePublisher {
     private final KafkaSender<byte[], byte[]> kafkaSender;
     private final String topicName;
 
+    private static final Logger log = LoggerFactory.getLogger(KafkaPublisher.class);
+
     public KafkaPublisher(ConfigProvider configProvider) {
         final Map<String, Object> props = new HashMap<>();
         props.put("bootstrap.servers", configProvider.getBootstrapServers());
@@ -26,6 +30,7 @@ public class KafkaPublisher implements MessagePublisher {
         final SenderOptions<byte[], byte[]> senderOptions = SenderOptions.create(props);
         this.kafkaSender = KafkaSender.create(senderOptions);
         this.topicName = configProvider.getTopicName();
+        log.info("Kafka publisher for topic {} and bootstrap servers {} initialized", topicName, configProvider.getBootstrapServers());
     }
 
     @Override
@@ -33,7 +38,7 @@ public class KafkaPublisher implements MessagePublisher {
         return kafkaSender.send(messageFlux.map(this::toSenderRecord))
                 .doOnNext(result -> {
                     if (result.exception() != null) {
-//                        log.error("Failed to publish Kafka message", result.exception());
+                        log.warn("Failed to publish Kafka message", result.exception());
                     }
                 })
                 .then();

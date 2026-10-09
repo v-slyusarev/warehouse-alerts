@@ -7,6 +7,8 @@ import com.github.vslyusarev.warehousealerts.warehouse.application.streaming.inp
 import com.github.vslyusarev.warehousealerts.warehouse.application.streaming.output.MessagePublisher;
 import com.github.vslyusarev.warehousealerts.warehouse.application.streaming.output.OutboundMessage;
 import com.github.vslyusarev.warehousealerts.warehouse.application.streaming.output.OutboundMessageSerializer;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
@@ -18,6 +20,9 @@ public class SensorMessagePipeline {
     private SensorMessageDeserializer sensorMessageDeserializer;
     private MessagePublisher messagePublisher;
     private OutboundMessageSerializer outboundMessageSerializer;
+
+    private static final Logger log = LoggerFactory.getLogger(SensorMessagePipeline.class);
+
 
     public SensorMessagePipeline withSensorMessageSourceFactory(SensorMessageSourceFactory sensorMessageSourceFactory) {
         this.sensorMessageSourceFactory = sensorMessageSourceFactory;
@@ -61,7 +66,7 @@ public class SensorMessagePipeline {
                 .filter(sensorMessageSampler::accept)
                 .map(message -> sensorMessageDeserializer.deserialize(message))
                 .map(outboundMessageSerializer::serialize)
-//                .doOnError(error -> log.error("Failed to process sensor message from {}", message.sender(), error))
+                .doOnError(error -> log.warn("Failed to process sensor message from {}", sensorMessage.sender(), error))
                 .onErrorResume(error -> Mono.empty());
     }
 }

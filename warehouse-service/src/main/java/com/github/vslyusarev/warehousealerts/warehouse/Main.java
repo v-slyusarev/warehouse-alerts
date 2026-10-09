@@ -15,12 +15,17 @@ import com.github.vslyusarev.warehousealerts.warehouse.application.streaming.Sen
 import com.github.vslyusarev.warehousealerts.warehouse.application.streaming.input.SensorMessageSourceFactory;
 import com.github.vslyusarev.warehousealerts.warehouse.application.streaming.output.MessagePublisher;
 import com.github.vslyusarev.warehousealerts.warehouse.application.streaming.output.OutboundMessageSerializer;
-
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import java.io.IOException;
 
 
 public class Main {
+    private static final Logger log = LoggerFactory.getLogger(Main.class);
+
     public static void main(String[] args) {
+        log.info("Application started");
+
         final ConfigProvider configProvider;
         try {
             configProvider = AppConfig.load();
@@ -34,7 +39,8 @@ public class Main {
         final OutboundMessageSerializer outboundMessageSerializer = new ProtobufOutboundMessageSerializer(configProvider);
         final MessagePublisher messagePublisher = new KafkaPublisher(configProvider);
 
-        System.out.println("Initialized");
+        log.info("Initialization completed");
+
         new SensorMessagePipeline()
                 .withSensorMessageSourceFactory(sensorMessageSourceFactory)
                 .withSensorMessageSampler(sensorMessageSampler)

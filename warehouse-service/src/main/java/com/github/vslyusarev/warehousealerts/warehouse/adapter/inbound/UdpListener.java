@@ -3,6 +3,8 @@ package com.github.vslyusarev.warehousealerts.warehouse.adapter.inbound;
 import com.github.vslyusarev.warehousealerts.warehouse.application.model.SensorType;
 import com.github.vslyusarev.warehousealerts.warehouse.application.streaming.input.SensorMessage;
 import com.github.vslyusarev.warehousealerts.warehouse.application.streaming.input.SensorMessageSource;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import reactor.core.publisher.Flux;
 import reactor.netty.udp.UdpServer;
 
@@ -14,12 +16,16 @@ public class UdpListener implements SensorMessageSource {
     private final TimeProvider timeProvider;
     private final SensorType sensorType;
 
+    private static final Logger log =
+            LoggerFactory.getLogger(UdpListener.class);
+
     public UdpListener(int port, TimeProvider timeProvider, SensorType sensorType) {
         udpServer = UdpServer.create()
                 .host("0.0.0.0")
                 .port(port);
         this.timeProvider = timeProvider;
         this.sensorType = sensorType;
+        log.info("UDP listener for sensor type {} started on port {}", sensorType, port);
     }
 
     @Override
