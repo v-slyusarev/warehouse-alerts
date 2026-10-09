@@ -1,12 +1,14 @@
-package com.github.vslyusarev.warehousealerts.warehouse.application.streaming.input;
+package com.github.vslyusarev.warehousealerts.warehouse.application.model.input;
 
 import com.github.vslyusarev.warehousealerts.warehouse.application.model.SensorType;
 
 import java.net.SocketAddress;
+import java.time.Instant;
 
 public record SensorMessage(
         SocketAddress sender,
-        long systemTimestampNanos,
+        long monotonicTimestamp,
+        Instant wallTimestamp,
         SensorType sensorType,
         byte[] payload
 ) {

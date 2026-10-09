@@ -1,9 +1,8 @@
 package com.github.vslyusarev.warehousealerts.warehouse.adapter.outbound;
 
-import com.github.vslyusarev.warehousealerts.warehouse.infrastructure.config.ConfigProvider;
-import com.github.vslyusarev.warehousealerts.warehouse.application.streaming.output.CorrelationMetadata;
-import com.github.vslyusarev.warehousealerts.warehouse.application.streaming.output.MessagePublisher;
-import com.github.vslyusarev.warehousealerts.warehouse.application.streaming.output.OutboundMessage;
+import com.github.vslyusarev.warehousealerts.warehouse.application.model.output.CorrelationMetadata;
+import com.github.vslyusarev.warehousealerts.warehouse.streaming.output.MessagePublisher;
+import com.github.vslyusarev.warehousealerts.warehouse.application.model.output.OutboundMessage;
 import org.apache.kafka.clients.producer.ProducerRecord;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -22,7 +21,7 @@ public class KafkaPublisher implements MessagePublisher {
 
     private static final Logger log = LoggerFactory.getLogger(KafkaPublisher.class);
 
-    public KafkaPublisher(ConfigProvider configProvider) {
+    public KafkaPublisher(KafkaConfigProvider configProvider) {
         final Map<String, Object> props = new HashMap<>();
         props.put("bootstrap.servers", configProvider.getBootstrapServers());
         props.put("key.serializer", "org.apache.kafka.common.serialization.ByteArraySerializer");
@@ -38,14 +37,17 @@ public class KafkaPublisher implements MessagePublisher {
         return kafkaSender.send(messageFlux.map(this::toSenderRecord))
                 .doOnNext(result -> {
                     if (result.exception() != null) {
-                        log.warn("Failed to publish Kafka message", result.exception());
+                        log.warn("Failed to publish Kafka message for sensor {} received at {}",
+                                result.correlationMetadata().sensorId(),
+                                result.correlationMetadata().timestamp(),
+                                result.exception());
                     }
                 })
                 .then();
     }
 
     private SenderRecord<byte[], byte[], CorrelationMetadata> toSenderRecord(OutboundMessage message) {
-        final var producerRecord = new ProducerRecord<>(topicName, message.key(), message.payload());
+        final ProducerRecord<byte[], byte[]> producerRecord = new ProducerRecord<>(topicName, message.key(), message.payload());
         return SenderRecord.create(producerRecord, message.correlationMetadata());
     }
 }

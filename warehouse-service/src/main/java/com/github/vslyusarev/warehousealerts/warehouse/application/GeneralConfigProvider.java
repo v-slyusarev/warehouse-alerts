@@ -1,4 +1,4 @@
-package com.github.vslyusarev.warehousealerts.warehouse.infrastructure;
+package com.github.vslyusarev.warehousealerts.warehouse.application;
 
 public interface GeneralConfigProvider {
     String getWarehouseId();

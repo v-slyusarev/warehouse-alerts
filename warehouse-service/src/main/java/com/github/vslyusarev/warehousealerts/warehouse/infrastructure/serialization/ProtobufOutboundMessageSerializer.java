@@ -2,44 +2,37 @@ package com.github.vslyusarev.warehousealerts.warehouse.infrastructure.serializa
 
 import com.github.vslyusarev.warehousealerts.shared.WarehouseMessageKey;
 import com.github.vslyusarev.warehousealerts.shared.WarehouseMessagePayload;
-import com.github.vslyusarev.warehousealerts.warehouse.infrastructure.config.ConfigProvider;
-import com.github.vslyusarev.warehousealerts.warehouse.application.model.SensorMeasurement;
+import com.github.vslyusarev.warehousealerts.warehouse.application.model.SensorEvent;
 import com.github.vslyusarev.warehousealerts.warehouse.application.model.SensorType;
-import com.github.vslyusarev.warehousealerts.warehouse.application.streaming.output.CorrelationMetadata;
-import com.github.vslyusarev.warehousealerts.warehouse.application.streaming.output.OutboundMessage;
-import com.github.vslyusarev.warehousealerts.warehouse.application.streaming.output.OutboundMessageSerializer;
+import com.github.vslyusarev.warehousealerts.warehouse.application.model.output.CorrelationMetadata;
+import com.github.vslyusarev.warehousealerts.warehouse.application.model.output.OutboundMessage;
+import com.github.vslyusarev.warehousealerts.warehouse.application.processing.OutboundMessageSerializer;
+import com.google.protobuf.util.Timestamps;
 
 public class ProtobufOutboundMessageSerializer implements OutboundMessageSerializer {
-    private final String warehouseId;
-    private final ProtobufMapper protobufMapper = new ProtobufMapper();
-
-    public ProtobufOutboundMessageSerializer(ConfigProvider configProvider) {
-        warehouseId = configProvider.getWarehouseId();
-    }
-
     @Override
-    public OutboundMessage serialize(SensorMeasurement sensorMeasurement) {
-        WarehouseMessageKey key = toWarehouseMessageKey(sensorMeasurement);
-        WarehouseMessagePayload payload = toWarehouseMessagePayload(sensorMeasurement);
-        CorrelationMetadata correlationMetadata = new CorrelationMetadata(sensorMeasurement);
+    public OutboundMessage serialize(SensorEvent sensorEvent) {
+        WarehouseMessageKey key = toWarehouseMessageKey(sensorEvent);
+        WarehouseMessagePayload payload = toWarehouseMessagePayload(sensorEvent);
+        CorrelationMetadata correlationMetadata = new CorrelationMetadata(sensorEvent);
 
         return new OutboundMessage(key.toByteArray(), payload.toByteArray(), correlationMetadata);
     }
 
-    private WarehouseMessageKey toWarehouseMessageKey(SensorMeasurement sensorMeasurement) {
+    private WarehouseMessageKey toWarehouseMessageKey(SensorEvent sensorEvent) {
         return WarehouseMessageKey.newBuilder()
-                .setWarehouseId(warehouseId)
-                .setSensorId(sensorMeasurement.sensorId())
+                .setWarehouseId(sensorEvent.warehouseId())
+                .setSensorId(sensorEvent.sensorId())
                 .build();
     }
 
-    private WarehouseMessagePayload toWarehouseMessagePayload(SensorMeasurement sensorMeasurement) {
+    private WarehouseMessagePayload toWarehouseMessagePayload(SensorEvent sensorEvent) {
        return WarehouseMessagePayload.newBuilder()
-                .setWarehouseId(warehouseId)
-                .setTimestamp(protobufMapper.toProtobufTimestamp(sensorMeasurement.timestamp()))
-                .setSensorType(toProtobufSensorType(sensorMeasurement.sensorType()))
-                .setSensorId(sensorMeasurement.sensorId())
-                .setValue(sensorMeasurement.value())
+                .setWarehouseId(sensorEvent.warehouseId())
+                .setTimestamp(Timestamps.fromMillis(sensorEvent.timestamp().toEpochMilli()))
+                .setSensorType(toProtobufSensorType(sensorEvent.sensorType()))
+                .setSensorId(sensorEvent.sensorId())
+                .setValue(sensorEvent.value())
                 .build();
     }
 

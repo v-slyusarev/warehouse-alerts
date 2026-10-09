@@ -1,4 +1,4 @@
-package com.github.vslyusarev.warehousealerts.warehouse.application.streaming.output;
+package com.github.vslyusarev.warehousealerts.warehouse.application.model.output;
 
 public record OutboundMessage(
         byte[] key,

@@ -1,7 +1,6 @@
 package com.github.vslyusarev.warehousealerts.warehouse.application.sampling;
 
-import com.github.vslyusarev.warehousealerts.warehouse.application.streaming.SensorMessageSampler;
-import com.github.vslyusarev.warehousealerts.warehouse.application.streaming.input.SensorMessage;
+import com.github.vslyusarev.warehousealerts.warehouse.application.model.input.SensorMessage;
 
 import java.net.SocketAddress;
 import java.util.Map;
@@ -26,11 +25,11 @@ public class InMemorySensorMessageSampler implements SensorMessageSampler {
         lastMessageTimestampBySender.compute(
                 message.sender(),
                 (sender, lastMessageTimestamp) -> {
-                    long current = message.systemTimestampNanos();
+                    final long currentMessageTimestamp = message.monotonicTimestamp();
 
-                    if (lastMessageTimestamp == null || current > lastMessageTimestamp + samplingIntervalNanos) {
+                    if (lastMessageTimestamp == null || currentMessageTimestamp > lastMessageTimestamp + samplingIntervalNanos) {
                         accepted[0] = true;
-                        return current;
+                        return currentMessageTimestamp;
                     }
 
                     return lastMessageTimestamp;

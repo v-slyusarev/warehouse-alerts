@@ -1,12 +1,13 @@
-package com.github.vslyusarev.warehousealerts.warehouse.application.streaming;
+package com.github.vslyusarev.warehousealerts.warehouse.streaming;
 
-import com.github.vslyusarev.warehousealerts.warehouse.application.streaming.input.SensorMessage;
-import com.github.vslyusarev.warehousealerts.warehouse.application.streaming.input.SensorMessageDeserializer;
-import com.github.vslyusarev.warehousealerts.warehouse.application.streaming.input.SensorMessageSource;
-import com.github.vslyusarev.warehousealerts.warehouse.application.streaming.input.SensorMessageSourceFactory;
-import com.github.vslyusarev.warehousealerts.warehouse.application.streaming.output.MessagePublisher;
-import com.github.vslyusarev.warehousealerts.warehouse.application.streaming.output.OutboundMessage;
-import com.github.vslyusarev.warehousealerts.warehouse.application.streaming.output.OutboundMessageSerializer;
+import com.github.vslyusarev.warehousealerts.warehouse.application.processing.SensorMessageProcessor;
+import com.github.vslyusarev.warehousealerts.warehouse.application.sampling.SensorMessageSampler;
+import com.github.vslyusarev.warehousealerts.warehouse.application.model.input.SensorMessage;
+import com.github.vslyusarev.warehousealerts.warehouse.streaming.input.SensorMessageSource;
+import com.github.vslyusarev.warehousealerts.warehouse.streaming.input.SensorMessageSourceFactory;
+import com.github.vslyusarev.warehousealerts.warehouse.streaming.output.MessagePublisher;
+import com.github.vslyusarev.warehousealerts.warehouse.application.model.output.OutboundMessage;
+import com.github.vslyusarev.warehousealerts.warehouse.application.processing.OutboundMessageSerializer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import reactor.core.publisher.Flux;
@@ -17,9 +18,8 @@ import java.util.List;
 public class SensorMessagePipeline {
     private SensorMessageSourceFactory sensorMessageSourceFactory;
     private SensorMessageSampler sensorMessageSampler;
-    private SensorMessageDeserializer sensorMessageDeserializer;
+    private SensorMessageProcessor sensorMessageProcessor;
     private MessagePublisher messagePublisher;
-    private OutboundMessageSerializer outboundMessageSerializer;
 
     private static final Logger log = LoggerFactory.getLogger(SensorMessagePipeline.class);
 
@@ -35,18 +35,13 @@ public class SensorMessagePipeline {
     }
 
 
-    public SensorMessagePipeline withSensorMessageDeserializer(SensorMessageDeserializer sensorMessageDeserializer) {
-        this.sensorMessageDeserializer = sensorMessageDeserializer;
+    public SensorMessagePipeline withSensorMessageProcessor(SensorMessageProcessor sensorMessageProcessor) {
+        this.sensorMessageProcessor = sensorMessageProcessor;
         return this;
     }
 
     public SensorMessagePipeline withMessagePublisher(MessagePublisher messagePublisher) {
         this.messagePublisher = messagePublisher;
-        return this;
-    }
-
-    public SensorMessagePipeline withOutboundMessageSerializer(OutboundMessageSerializer outboundMessageSerializer) {
-        this.outboundMessageSerializer = outboundMessageSerializer;
         return this;
     }
 
@@ -64,8 +59,7 @@ public class SensorMessagePipeline {
     private Mono<OutboundMessage> processMessage(SensorMessage sensorMessage) {
         return Mono.just(sensorMessage)
                 .filter(sensorMessageSampler::accept)
-                .map(message -> sensorMessageDeserializer.deserialize(message))
-                .map(outboundMessageSerializer::serialize)
+                .map(sensorMessageProcessor::process)
                 .doOnError(error -> log.warn("Failed to process sensor message from {}", sensorMessage.sender(), error))
                 .onErrorResume(error -> Mono.empty());
     }

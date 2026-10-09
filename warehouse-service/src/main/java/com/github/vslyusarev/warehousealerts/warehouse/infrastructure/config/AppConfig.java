@@ -22,7 +22,7 @@ public class AppConfig implements ConfigProvider {
 
 
     public static AppConfig load() throws IOException {
-        var properties = new Properties();
+        final Properties properties = new Properties();
 
         try (InputStream inputStream = AppConfig.class.getResourceAsStream("/application.properties")) {
             if (inputStream == null) {
@@ -63,7 +63,7 @@ public class AppConfig implements ConfigProvider {
 
     @Override
     public int getUdpPort(SensorType sensorType) {
-        var port = udpPorts.get(sensorType);
+        final Integer port = udpPorts.get(sensorType);
         if (port == null) {
             throw new IllegalArgumentException("UDP port for sensor type " + sensorType + " is not configured");
         }
