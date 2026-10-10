@@ -18,7 +18,6 @@ import com.github.vslyusarev.warehousealerts.warehouse.streaming.output.MessageP
 import com.github.vslyusarev.warehousealerts.warehouse.application.processing.OutboundMessageWriter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import java.io.IOException;
 
 
 public class Main {
@@ -27,12 +26,7 @@ public class Main {
     public static void main(String[] args) {
         log.info("Application started");
 
-        final ConfigProvider configProvider;
-        try {
-            configProvider = AppConfig.load("application.properties");
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
+        final ConfigProvider configProvider = new AppConfig("/application.properties");
         final TimeProvider timeProvider = new SystemTimeProvider();
         final SensorMessageSourceFactory sensorMessageSourceFactory = new UdpListenerFactory(configProvider, timeProvider);
         final SensorMessageDeserializer sensorMessageDeserializer = new DefaultSensorMessageDeserializer();
@@ -42,10 +36,7 @@ public class Main {
 
         log.info("Initialization completed");
 
-        new SensorMessagePipeline()
-                .withSensorMessageSourceFactory(sensorMessageSourceFactory)
-                .withSensorMessageProcessor(sensorMessageProcessor)
-                .withMessagePublisher(messagePublisher)
+        new SensorMessagePipeline(sensorMessageSourceFactory, sensorMessageProcessor, messagePublisher)
                 .runPipeline();
     }
 }

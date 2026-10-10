@@ -1,5 +1,6 @@
 package com.github.vslyusarev.warehousealerts.warehouse.adapter.outbound;
 
+import com.github.vslyusarev.warehousealerts.shared.kafka.KafkaConfigProvider;
 import com.github.vslyusarev.warehousealerts.warehouse.application.model.output.CorrelationMetadata;
 import com.github.vslyusarev.warehousealerts.warehouse.streaming.output.MessagePublisher;
 import com.github.vslyusarev.warehousealerts.warehouse.application.model.output.OutboundMessage;
@@ -12,7 +13,6 @@ import reactor.kafka.sender.KafkaSender;
 import reactor.kafka.sender.SenderOptions;
 import reactor.kafka.sender.SenderRecord;
 
-import java.util.HashMap;
 import java.util.Map;
 
 public class KafkaPublisher implements MessagePublisher {
@@ -22,10 +22,11 @@ public class KafkaPublisher implements MessagePublisher {
     private static final Logger log = LoggerFactory.getLogger(KafkaPublisher.class);
 
     public KafkaPublisher(KafkaConfigProvider configProvider) {
-        final Map<String, Object> props = new HashMap<>();
-        props.put("bootstrap.servers", configProvider.getBootstrapServers());
-        props.put("key.serializer", "org.apache.kafka.common.serialization.ByteArraySerializer");
-        props.put("value.serializer", "org.apache.kafka.common.serialization.ByteArraySerializer");
+        final Map<String, Object> props = Map.of(
+         "bootstrap.servers", configProvider.getBootstrapServers(),
+         "key.serializer", "org.apache.kafka.common.serialization.ByteArraySerializer",
+         "value.serializer", "org.apache.kafka.common.serialization.ByteArraySerializer"
+        );
         final SenderOptions<byte[], byte[]> senderOptions = SenderOptions.create(props);
         this.kafkaSender = KafkaSender.create(senderOptions);
         this.topicName = configProvider.getTopicName();

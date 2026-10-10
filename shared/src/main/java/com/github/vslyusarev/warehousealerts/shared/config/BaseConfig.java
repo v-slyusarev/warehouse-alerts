@@ -1,18 +1,13 @@
 package com.github.vslyusarev.warehousealerts.shared.config;
 
-import java.io.IOException;
 import java.io.InputStream;
 import java.util.MissingResourceException;
 import java.util.Properties;
 
 public abstract class BaseConfig {
-    private final String propertiesFilePath;
+    protected final Properties properties;
 
     protected BaseConfig(String propertiesFilePath) {
-        this.propertiesFilePath = propertiesFilePath;
-    }
-
-    protected Properties loadProperties() throws IOException {
         final Properties properties = new Properties();
 
         try (InputStream inputStream = BaseConfig.class.getResourceAsStream(propertiesFilePath)) {
@@ -20,9 +15,11 @@ public abstract class BaseConfig {
                 throw new MissingResourceException("%s not found".formatted(propertiesFilePath), this.getClass().getName(), propertiesFilePath);
             }
             properties.load(inputStream);
+        } catch (Exception e) {
+            throw new RuntimeException("Failed to load config", e);
         }
 
-        return properties;
+        this.properties = properties;
     }
 
     protected static String required(Properties properties, String key) {

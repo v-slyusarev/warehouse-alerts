@@ -1,4 +1,4 @@
-package com.github.vslyusarev.warehousealerts.warehouse.adapter.outbound;
+package com.github.vslyusarev.warehousealerts.shared.kafka;
 
 public interface KafkaConfigProvider {
     String getTopicName();

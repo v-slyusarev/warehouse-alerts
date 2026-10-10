@@ -14,26 +14,16 @@ import reactor.core.publisher.Mono;
 import java.util.List;
 
 public class SensorMessagePipeline {
-    private SensorMessageSourceFactory sensorMessageSourceFactory;
-    private SensorMessageProcessor sensorMessageProcessor;
-    private MessagePublisher messagePublisher;
+    private final SensorMessageSourceFactory sensorMessageSourceFactory;
+    private final SensorMessageProcessor sensorMessageProcessor;
+    private final MessagePublisher messagePublisher;
 
     private static final Logger log = LoggerFactory.getLogger(SensorMessagePipeline.class);
 
-
-    public SensorMessagePipeline withSensorMessageSourceFactory(SensorMessageSourceFactory sensorMessageSourceFactory) {
+    public SensorMessagePipeline(SensorMessageSourceFactory sensorMessageSourceFactory, SensorMessageProcessor sensorMessageProcessor, MessagePublisher messagePublisher) {
         this.sensorMessageSourceFactory = sensorMessageSourceFactory;
-        return this;
-    }
-
-    public SensorMessagePipeline withSensorMessageProcessor(SensorMessageProcessor sensorMessageProcessor) {
         this.sensorMessageProcessor = sensorMessageProcessor;
-        return this;
-    }
-
-    public SensorMessagePipeline withMessagePublisher(MessagePublisher messagePublisher) {
         this.messagePublisher = messagePublisher;
-        return this;
     }
 
     public void runPipeline() {
