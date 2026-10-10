@@ -1,6 +1,7 @@
 package com.github.vslyusarev.warehousealerts.warehouse.infrastructure.config;
 
-import com.github.vslyusarev.warehousealerts.warehouse.application.model.SensorType;
+import com.github.vslyusarev.warehousealerts.shared.config.BaseConfig;
+import com.github.vslyusarev.warehousealerts.shared.contracts.SensorType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -10,7 +11,7 @@ import java.util.Arrays;
 import java.util.Map;
 import java.util.Properties;
 
-public class AppConfig implements ConfigProvider {
+public class AppConfig extends BaseConfig implements ConfigProvider {
     String warehouseId;
     String topicName;
     String bootstrapServers;
@@ -19,8 +20,7 @@ public class AppConfig implements ConfigProvider {
 
     private static final Logger log = LoggerFactory.getLogger(AppConfig.class);
 
-
-    public static AppConfig load() throws IOException {
+    public static AppConfig load(String propertiesFilePath) throws IOException {
         final Properties properties = new Properties();
 
         try (InputStream inputStream = AppConfig.class.getResourceAsStream("/application.properties")) {
@@ -30,7 +30,7 @@ public class AppConfig implements ConfigProvider {
             properties.load(inputStream);
         }
 
-        final AppConfig appConfig = new AppConfig();
+        final AppConfig appConfig = new AppConfig(propertiesFilePath);
 
         appConfig.setWarehouseId(required(properties, "warehouse.id").intern());
         appConfig.setBootstrapServers(required(properties, "KafkaPublisher.bootstrapServers").intern());
@@ -76,15 +76,9 @@ public class AppConfig implements ConfigProvider {
         return "UdpListener.port.%s".formatted(sensorType.name()).intern();
     }
 
-    private static String required(Properties properties, String key) {
-        String value = properties.getProperty(key);
-        if (value == null || value.isBlank()) {
-            throw new UndefinedConfigException(key);
-        }
-        return value.trim();
+    private AppConfig(String propertiesFilePath) {
+        super(propertiesFilePath);
     }
-
-    private AppConfig() {}
 
     private void setWarehouseId(String warehouseId) {
         this.warehouseId = warehouseId;

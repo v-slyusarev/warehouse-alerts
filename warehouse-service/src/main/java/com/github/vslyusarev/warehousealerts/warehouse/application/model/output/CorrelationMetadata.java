@@ -1,6 +1,6 @@
 package com.github.vslyusarev.warehousealerts.warehouse.application.model.output;
 
-import com.github.vslyusarev.warehousealerts.warehouse.application.model.SensorEvent;
+import com.github.vslyusarev.warehousealerts.shared.contracts.SensorEvent;
 
 import java.time.Instant;
 

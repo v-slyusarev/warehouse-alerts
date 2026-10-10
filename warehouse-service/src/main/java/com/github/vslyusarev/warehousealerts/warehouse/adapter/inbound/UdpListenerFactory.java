@@ -1,6 +1,6 @@
 package com.github.vslyusarev.warehousealerts.warehouse.adapter.inbound;
 
-import com.github.vslyusarev.warehousealerts.warehouse.application.model.SensorType;
+import com.github.vslyusarev.warehousealerts.shared.contracts.SensorType;
 import com.github.vslyusarev.warehousealerts.warehouse.streaming.input.SensorMessageSource;
 import com.github.vslyusarev.warehousealerts.warehouse.streaming.input.SensorMessageSourceFactory;
 

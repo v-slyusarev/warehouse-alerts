@@ -12,7 +12,11 @@ repositories {
 }
 
 dependencies {
+    implementation 'com.google.protobuf:protobuf-java-util:4.33.0'
     api 'com.google.protobuf:protobuf-java:4.33.0'
+    testImplementation platform('org.junit:junit-bom:6.0.0')
+    testImplementation 'org.junit.jupiter:junit-jupiter'
+    testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
 }
 
 protobuf {
@@ -21,9 +25,12 @@ protobuf {
     }
 }
 
-
 java {
     withSourcesJar()
+}
+
+test {
+    useJUnitPlatform()
 }
 
 publishing {

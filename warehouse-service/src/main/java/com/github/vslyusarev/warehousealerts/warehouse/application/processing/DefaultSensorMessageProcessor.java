@@ -2,16 +2,16 @@ package com.github.vslyusarev.warehousealerts.warehouse.application.processing;
 
 import com.github.vslyusarev.warehousealerts.warehouse.application.GeneralConfigProvider;
 import com.github.vslyusarev.warehousealerts.warehouse.application.model.input.SensorMeasurement;
-import com.github.vslyusarev.warehousealerts.warehouse.application.model.SensorEvent;
+import com.github.vslyusarev.warehousealerts.shared.contracts.SensorEvent;
 import com.github.vslyusarev.warehousealerts.warehouse.application.model.input.SensorMessage;
 import com.github.vslyusarev.warehousealerts.warehouse.application.model.output.OutboundMessage;
 
 public class DefaultSensorMessageProcessor implements SensorMessageProcessor {
     private final SensorMessageDeserializer sensorMessageDeserializer;
-    private final OutboundMessageSerializer outboundMessageSerializer;
+    private final OutboundMessageWriter outboundMessageSerializer;
     private final String warehouseId;
 
-    public DefaultSensorMessageProcessor(SensorMessageDeserializer sensorMessageDeserializer, OutboundMessageSerializer outboundMessageSerializer, GeneralConfigProvider configProvider) {
+    public DefaultSensorMessageProcessor(SensorMessageDeserializer sensorMessageDeserializer, OutboundMessageWriter outboundMessageSerializer, GeneralConfigProvider configProvider) {
         this.sensorMessageDeserializer = sensorMessageDeserializer;
         this.outboundMessageSerializer = outboundMessageSerializer;
         this.warehouseId = configProvider.getWarehouseId();

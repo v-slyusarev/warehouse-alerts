@@ -1,6 +1,6 @@
 package com.github.vslyusarev.warehousealerts.warehouse.adapter.inbound;
 
-import com.github.vslyusarev.warehousealerts.warehouse.application.model.SensorType;
+import com.github.vslyusarev.warehousealerts.shared.contracts.SensorType;
 import com.github.vslyusarev.warehousealerts.warehouse.application.model.input.SensorMessage;
 import com.github.vslyusarev.warehousealerts.warehouse.streaming.input.SensorMessageSource;
 import org.slf4j.Logger;
@@ -39,7 +39,6 @@ public class UdpListener implements SensorMessageSource {
                             content.getBytes(content.readerIndex(), bytes);
                             return new SensorMessage(
                                     packet.sender(),
-                                    timeProvider.getCurrentSystemTimeNano(),
                                     timeProvider.getCurrentInstant(),
                                     sensorType,
                                     bytes

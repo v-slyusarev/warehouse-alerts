@@ -5,10 +5,6 @@ import com.github.vslyusarev.warehousealerts.warehouse.adapter.inbound.TimeProvi
 import java.time.Instant;
 
 public class SystemTimeProvider implements TimeProvider {
-    @Override
-    public long getCurrentSystemTimeNano() {
-        return System.nanoTime();
-    }
 
     @Override
     public Instant getCurrentInstant() {
