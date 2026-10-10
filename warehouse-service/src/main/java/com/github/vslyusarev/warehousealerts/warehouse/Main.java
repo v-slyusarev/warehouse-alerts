@@ -5,12 +5,10 @@ import com.github.vslyusarev.warehousealerts.warehouse.adapter.inbound.UdpListen
 import com.github.vslyusarev.warehousealerts.warehouse.adapter.outbound.KafkaPublisher;
 import com.github.vslyusarev.warehousealerts.warehouse.application.processing.DefaultSensorMessageProcessor;
 import com.github.vslyusarev.warehousealerts.warehouse.application.processing.SensorMessageProcessor;
-import com.github.vslyusarev.warehousealerts.warehouse.application.sampling.InMemorySensorMessageSampler;
 import com.github.vslyusarev.warehousealerts.warehouse.infrastructure.SystemTimeProvider;
 import com.github.vslyusarev.warehousealerts.warehouse.infrastructure.config.AppConfig;
 import com.github.vslyusarev.warehousealerts.warehouse.infrastructure.config.ConfigProvider;
 import com.github.vslyusarev.warehousealerts.warehouse.infrastructure.serialization.ProtobufOutboundMessageSerializer;
-import com.github.vslyusarev.warehousealerts.warehouse.application.sampling.SensorMessageSampler;
 import com.github.vslyusarev.warehousealerts.warehouse.application.processing.SensorMessageDeserializer;
 import com.github.vslyusarev.warehousealerts.warehouse.infrastructure.serialization.DefaultSensorMessageDeserializer;
 import com.github.vslyusarev.warehousealerts.warehouse.streaming.SensorMessagePipeline;
@@ -35,7 +33,6 @@ public class Main {
             throw new RuntimeException(e);
         }
         final TimeProvider timeProvider = new SystemTimeProvider();
-        final SensorMessageSampler sensorMessageSampler = new InMemorySensorMessageSampler(configProvider);
         final SensorMessageSourceFactory sensorMessageSourceFactory = new UdpListenerFactory(configProvider, timeProvider);
         final SensorMessageDeserializer sensorMessageDeserializer = new DefaultSensorMessageDeserializer();
         final OutboundMessageSerializer outboundMessageSerializer = new ProtobufOutboundMessageSerializer();
@@ -46,7 +43,6 @@ public class Main {
 
         new SensorMessagePipeline()
                 .withSensorMessageSourceFactory(sensorMessageSourceFactory)
-                .withSensorMessageSampler(sensorMessageSampler)
                 .withSensorMessageProcessor(sensorMessageProcessor)
                 .withMessagePublisher(messagePublisher)
                 .runPipeline();

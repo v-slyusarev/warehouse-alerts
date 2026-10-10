@@ -14,7 +14,6 @@ public class AppConfig implements ConfigProvider {
     String warehouseId;
     String topicName;
     String bootstrapServers;
-    long samplingIntervalMs;
 
     Map<SensorType, Integer> udpPorts;
 
@@ -37,7 +36,6 @@ public class AppConfig implements ConfigProvider {
         appConfig.setBootstrapServers(required(properties, "KafkaPublisher.bootstrapServers").intern());
         appConfig.setTopicName(required(properties, "KafkaPublisher.topic").intern());
         appConfig.setUdpPorts(loadUdpPorts(properties));
-        appConfig.setSamplingIntervalMs(Long.parseLong(required(properties, "SensorMessageSampler.samplingIntervalMs")));
         log.info("Config loaded");
         return appConfig;
     }
@@ -55,10 +53,6 @@ public class AppConfig implements ConfigProvider {
     @Override
     public String getBootstrapServers() {
         return bootstrapServers;
-    }
-
-    public long getSamplingIntervalMs() {
-        return samplingIntervalMs;
     }
 
     @Override
@@ -102,10 +96,6 @@ public class AppConfig implements ConfigProvider {
 
     private void setBootstrapServers(String bootstrapServers) {
         this.bootstrapServers = bootstrapServers;
-    }
-
-    private void setSamplingIntervalMs(long samplingIntervalMs) {
-        this.samplingIntervalMs = samplingIntervalMs;
     }
 
     private void setUdpPorts(Map<SensorType, Integer> udpPorts) {
