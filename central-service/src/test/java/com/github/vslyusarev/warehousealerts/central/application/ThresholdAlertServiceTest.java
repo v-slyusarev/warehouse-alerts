@@ -15,49 +15,55 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 class ThresholdAlertServiceTest {
-    final static SensorEvent sensorEvent = new SensorEvent(
-            "warehouse1",
-            "t1",
-            SensorType.TEMPERATURE,
-            30,
-            Instant.EPOCH
-    );
+    final static int THRESHOLD = 35;
+    final static int VALUE_UNDER_THRESHOLD = THRESHOLD - 1;
+    final static int VALUE_ABOVE_THRESHOLD = THRESHOLD + 1;
+
+    private static SensorEvent getTemperatureEvent(int temperature) {
+        return new SensorEvent(
+                "warehouse1",
+                "t1",
+                SensorType.TEMPERATURE,
+                temperature,
+                Instant.EPOCH
+        );
+    }
 
     @Test
     void testAlertCreatedWhenNoStateAndThresholdCrossed() {
         final ThresholdAlertService thresholdAlertService = new DefaultThresholdAlertService(
                 (warehouseId, sensorId, newValue) -> Optional.empty(),
-                () -> Map.of(SensorType.TEMPERATURE, 25)
+                () -> Map.of(SensorType.TEMPERATURE, THRESHOLD)
         );
 
-        final Optional<Alert> optionalAlert = thresholdAlertService.process(sensorEvent);
+        final Optional<Alert> optionalAlert = thresholdAlertService.process(getTemperatureEvent(VALUE_ABOVE_THRESHOLD));
         assertTrue(optionalAlert.isPresent());
         assertEquals("warehouse1", optionalAlert.get().warehouseId());
         assertEquals("t1", optionalAlert.get().sensorId());
         assertEquals(Instant.EPOCH, optionalAlert.get().timestamp());
-        assertEquals(25, optionalAlert.get().threshold());
-        assertEquals(30, optionalAlert.get().actualValue());
+        assertEquals(THRESHOLD, optionalAlert.get().threshold());
+        assertEquals(VALUE_ABOVE_THRESHOLD, optionalAlert.get().actualValue());
     }
 
     @Test
     void testAlertNotCreatedWhenValueExactlyAtThreshold() {
         final ThresholdAlertService thresholdAlertService = new DefaultThresholdAlertService(
                 (warehouseId, sensorId, newValue) -> Optional.empty(),
-                () -> Map.of(SensorType.TEMPERATURE, 30)
+                () -> Map.of(SensorType.TEMPERATURE, THRESHOLD)
         );
 
-        final Optional<Alert> optionalAlert = thresholdAlertService.process(sensorEvent);
+        final Optional<Alert> optionalAlert = thresholdAlertService.process(getTemperatureEvent(THRESHOLD));
         assertTrue(optionalAlert.isEmpty());
     }
 
     @Test
     void testAlertNotCreatedWhenStateIsAboveThreshold() {
         final ThresholdAlertService thresholdAlertService = new DefaultThresholdAlertService(
-                (warehouseId, sensorId, newValue) -> Optional.of(30),
-                () -> Map.of(SensorType.TEMPERATURE, 25)
+                (warehouseId, sensorId, newValue) -> Optional.of(VALUE_ABOVE_THRESHOLD),
+                () -> Map.of(SensorType.TEMPERATURE, THRESHOLD)
         );
 
-        final Optional<Alert> optionalAlert = thresholdAlertService.process(sensorEvent);
+        final Optional<Alert> optionalAlert = thresholdAlertService.process(getTemperatureEvent(VALUE_ABOVE_THRESHOLD));
         assertTrue(optionalAlert.isEmpty());
     }
 
@@ -65,10 +71,10 @@ class ThresholdAlertServiceTest {
     void testAlertNotCreatedWhenThresholdNotCrossed() {
         final ThresholdAlertService thresholdAlertService = new DefaultThresholdAlertService(
                 (warehouseId, sensorId, newValue) -> Optional.empty(),
-                () -> Map.of(SensorType.TEMPERATURE, 25)
+                () -> Map.of(SensorType.TEMPERATURE, THRESHOLD)
         );
 
-        final Optional<Alert> optionalAlert = thresholdAlertService.process(sensorEvent);
+        final Optional<Alert> optionalAlert = thresholdAlertService.process(getTemperatureEvent(VALUE_UNDER_THRESHOLD));
         assertTrue(optionalAlert.isEmpty());
     }
 
@@ -76,10 +82,10 @@ class ThresholdAlertServiceTest {
     void testAlertNotCreatedWhenThresholdNotDefined() {
         final ThresholdAlertService thresholdAlertService = new DefaultThresholdAlertService(
                 (warehouseId, sensorId, newValue) -> Optional.empty(),
-                () -> Map.of(SensorType.TEMPERATURE, 25)
+                () -> Map.of(SensorType.HUMIDITY, THRESHOLD)
         );
 
-        final Optional<Alert> optionalAlert = thresholdAlertService.process(sensorEvent);
+        final Optional<Alert> optionalAlert = thresholdAlertService.process(getTemperatureEvent(VALUE_ABOVE_THRESHOLD));
         assertTrue(optionalAlert.isEmpty());
     }
 }

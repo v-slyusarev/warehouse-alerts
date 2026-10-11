@@ -12,10 +12,10 @@ import java.util.Map;
 public class AppConfig extends KafkaConfig implements ConfigProvider {
     private static final Logger log = LoggerFactory.getLogger(AppConfig.class);
 
-    private Map<SensorType, Integer> thresholds;
-    private Duration maxEventAge;
-    private boolean filterEnabled = false;
-    private String consumerGroupId;
+    private final Map<SensorType, Integer> thresholds;
+    private final Duration maxEventAge;
+    private final boolean filterEnabled;
+    private final String consumerGroupId;
 
     public AppConfig(String propertiesFilePath) {
         super(propertiesFilePath);
@@ -30,6 +30,9 @@ public class AppConfig extends KafkaConfig implements ConfigProvider {
         if (maxEventAgeString != null) {
             maxEventAge = Duration.parse(maxEventAgeString);
             filterEnabled = true;
+        } else {
+            maxEventAge = null;
+            filterEnabled = false;
         }
 
         consumerGroupId = required(properties, "kafka.consumer.groupId").intern();
@@ -39,24 +42,16 @@ public class AppConfig extends KafkaConfig implements ConfigProvider {
 
     @Override
     public Map<SensorType, Integer> getThresholds() {
-        return Map.of();
+        return thresholds;
     }
 
     @Override
     public Duration getMaxEventAge() {
-        return null;
-    }
-
-    private void setThresholds(Map<SensorType, Integer> thresholds) {
-        this.thresholds = thresholds;
+        return maxEventAge;
     }
 
     public boolean isFilterEnabled() {
         return filterEnabled;
-    }
-
-    private void setFilterEnabled(boolean filterEnabled) {
-        this.filterEnabled = filterEnabled;
     }
 
     @Override

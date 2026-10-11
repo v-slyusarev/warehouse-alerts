@@ -8,12 +8,16 @@ import com.github.vslyusarev.warehousealerts.central.application.state.InMemoryS
 import com.github.vslyusarev.warehousealerts.central.application.state.SensorsState;
 import com.github.vslyusarev.warehousealerts.central.application.thresholds.DefaultThresholdAlertService;
 import com.github.vslyusarev.warehousealerts.central.application.thresholds.ThresholdAlertService;
+import com.github.vslyusarev.warehousealerts.central.infrastructure.SystemTimeProvider;
 import com.github.vslyusarev.warehousealerts.central.infrastructure.config.AppConfig;
 import com.github.vslyusarev.warehousealerts.central.infrastructure.config.ConfigProvider;
 import com.github.vslyusarev.warehousealerts.central.streaming.*;
 import com.github.vslyusarev.warehousealerts.shared.serialization.WarehouseMessageDeserializer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import reactor.util.retry.Retry;
+
+import java.time.Duration;
 
 public class Main {
     private static final Logger log = LoggerFactory.getLogger(Main.class);
@@ -22,17 +26,15 @@ public class Main {
         log.info("Application started");
 
         final ConfigProvider configProvider = new AppConfig("/application.properties");
-        final EventSource eventSource = new KafkaConsumer(new WarehouseMessageDeserializer(), configProvider);
         final SensorsState sensorsState = new InMemorySensorsState();
         final ThresholdAlertService thresholdAlertService = new DefaultThresholdAlertService(sensorsState, configProvider);
         final AlertEmitter alertEmitter = new ConsoleAlertEmitter();
-        final DefaultEventProcessor eventProcessor = new DefaultEventProcessor(thresholdAlertService, alertEmitter);
+        DefaultEventProcessor eventProcessor = new DefaultEventProcessor(thresholdAlertService, alertEmitter, Retry.backoff(5, Duration.ofMillis(500)));
         if(configProvider.isFilterEnabled()) {
-            final EventFilter eventFilter = new OutdatedEventFilter(configProvider);
-            eventProcessor.setEventFilter(eventFilter);
+            final EventFilter eventFilter = new OutdatedEventFilter(new SystemTimeProvider(), configProvider);
+            eventProcessor = new FilteringEventProcessor(eventProcessor, eventFilter);
         }
-        final EventPipeline eventPipeline = new EventPipeline(eventSource, eventProcessor);
-        eventPipeline.run();
-
+        final KafkaConsumer kafkaConsumer = new KafkaConsumer(new WarehouseMessageDeserializer(), configProvider, eventProcessor);
+        kafkaConsumer.run();
     }
 }

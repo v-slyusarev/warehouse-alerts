@@ -46,3 +46,6 @@ services:
     ports:
     - "3344:3344/udp"
     - "3355:3355/udp"
+
+  central-service:
+    image: v-slyusarev/central-service:1.0.0

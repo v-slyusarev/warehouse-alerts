@@ -9,9 +9,10 @@ public class ConsoleAlertEmitter implements AlertEmitter {
     public Mono<Void> emit(Alert alert) {
         return Mono.fromCallable(() -> {
             System.out.printf(
-                    "ALERT: Threshold crossed for warehouse %s, sensor %s. Threshold: %d, actual value: %d%n",
+                    "ALERT: Threshold crossed for warehouse %s, sensor %s at %s. Threshold: %d, actual value: %d%n",
                     alert.warehouseId(),
                     alert.sensorId(),
+                    alert.timestamp(),
                     alert.threshold(),
                     alert.actualValue());
             return null;
