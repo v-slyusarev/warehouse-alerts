@@ -12,7 +12,7 @@ import com.github.vslyusarev.warehousealerts.central.infrastructure.SystemTimePr
 import com.github.vslyusarev.warehousealerts.central.infrastructure.config.AppConfig;
 import com.github.vslyusarev.warehousealerts.central.infrastructure.config.ConfigProvider;
 import com.github.vslyusarev.warehousealerts.central.streaming.*;
-import com.github.vslyusarev.warehousealerts.shared.serialization.WarehouseMessageDeserializer;
+import com.github.vslyusarev.warehousealerts.shared.serialization.DefaultWarehouseMessageDeserializer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import reactor.util.retry.Retry;
@@ -29,12 +29,14 @@ public class Main {
         final SensorsState sensorsState = new InMemorySensorsState();
         final ThresholdAlertService thresholdAlertService = new DefaultThresholdAlertService(sensorsState, configProvider);
         final AlertEmitter alertEmitter = new ConsoleAlertEmitter();
-        DefaultEventProcessor eventProcessor = new DefaultEventProcessor(thresholdAlertService, alertEmitter, Retry.backoff(5, Duration.ofMillis(500)));
+        DefaultEventProcessor eventProcessor = new DefaultEventProcessor(thresholdAlertService,
+                alertEmitter,
+                Retry.backoff(5, Duration.ofMillis(200)));
         if(configProvider.isFilterEnabled()) {
             final EventFilter eventFilter = new OutdatedEventFilter(new SystemTimeProvider(), configProvider);
             eventProcessor = new FilteringEventProcessor(eventProcessor, eventFilter);
         }
-        final KafkaConsumer kafkaConsumer = new KafkaConsumer(new WarehouseMessageDeserializer(), configProvider, eventProcessor);
+        final KafkaConsumer kafkaConsumer = new KafkaConsumer(configProvider, new DefaultWarehouseMessageDeserializer(), eventProcessor);
         kafkaConsumer.run();
     }
 }

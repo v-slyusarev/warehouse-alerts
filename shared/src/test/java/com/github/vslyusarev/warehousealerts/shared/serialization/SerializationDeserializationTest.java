@@ -30,8 +30,8 @@ class SerializationDeserializationTest {
 
     @Test
     void testPayloadSerializationDeserialization() {
-        final WarehouseMessageSerializer serializer = new WarehouseMessageSerializer();
-        final WarehouseMessageDeserializer deserializer = new WarehouseMessageDeserializer();
+        final DefaultWarehouseMessageSerializer serializer = new DefaultWarehouseMessageSerializer();
+        final DefaultWarehouseMessageDeserializer deserializer = new DefaultWarehouseMessageDeserializer();
 
         for(var event: List.of(temperatureEvent, humidityEvent)) {
             final byte[] serializedMessage = serializer.toWarehouseMessagePayload(event);
@@ -42,7 +42,7 @@ class SerializationDeserializationTest {
 
     @Test
     void testKeySerialization() {
-        final WarehouseMessageSerializer serializer = new WarehouseMessageSerializer();
+        final DefaultWarehouseMessageSerializer serializer = new DefaultWarehouseMessageSerializer();
 
         final byte[] serializedMessageKey = serializer.toWarehouseMessageKey(humidityEvent);
 
@@ -57,7 +57,7 @@ class SerializationDeserializationTest {
 
     @Test
     void testInvalidMessageDeserialization() {
-        final WarehouseMessageDeserializer deserializer = new WarehouseMessageDeserializer();
+        final DefaultWarehouseMessageDeserializer deserializer = new DefaultWarehouseMessageDeserializer();
 
         assertThrows(DeserializationException.class, () -> {
             deserializer.toSensorEvent("Invalid".getBytes());

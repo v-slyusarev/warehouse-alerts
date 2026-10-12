@@ -1,6 +1,6 @@
 package com.github.vslyusarev.warehousealerts.warehouse;
 
-import com.github.vslyusarev.warehousealerts.shared.serialization.WarehouseMessageSerializer;
+import com.github.vslyusarev.warehousealerts.shared.serialization.DefaultWarehouseMessageSerializer;
 import com.github.vslyusarev.warehousealerts.warehouse.adapter.inbound.TimeProvider;
 import com.github.vslyusarev.warehousealerts.warehouse.adapter.inbound.UdpListenerFactory;
 import com.github.vslyusarev.warehousealerts.warehouse.adapter.outbound.KafkaPublisher;
@@ -30,7 +30,7 @@ public class Main {
         final TimeProvider timeProvider = new SystemTimeProvider();
         final SensorMessageSourceFactory sensorMessageSourceFactory = new UdpListenerFactory(configProvider, timeProvider);
         final SensorMessageDeserializer sensorMessageDeserializer = new DefaultSensorMessageDeserializer();
-        final OutboundMessageWriter outboundMessageSerializer = new DefaultOutboundMessageWriter(new WarehouseMessageSerializer());
+        final OutboundMessageWriter outboundMessageSerializer = new DefaultOutboundMessageWriter(new DefaultWarehouseMessageSerializer());
         final SensorMessageProcessor sensorMessageProcessor = new DefaultSensorMessageProcessor(sensorMessageDeserializer, outboundMessageSerializer, configProvider);
         final MessagePublisher messagePublisher = new KafkaPublisher(configProvider);
 
