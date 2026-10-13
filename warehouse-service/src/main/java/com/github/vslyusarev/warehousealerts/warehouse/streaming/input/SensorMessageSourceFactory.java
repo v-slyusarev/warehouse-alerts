@@ -1,6 +1,8 @@
 package com.github.vslyusarev.warehousealerts.warehouse.streaming.input;
 
 import com.github.vslyusarev.warehousealerts.shared.contracts.SensorType;
+import com.github.vslyusarev.warehousealerts.warehouse.application.model.input.SensorMessage;
+import org.reactivestreams.Publisher;
 
 import java.util.Arrays;
 import java.util.List;

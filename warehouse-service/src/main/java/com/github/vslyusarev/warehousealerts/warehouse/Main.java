@@ -18,6 +18,9 @@ import com.github.vslyusarev.warehousealerts.warehouse.streaming.output.MessageP
 import com.github.vslyusarev.warehousealerts.warehouse.application.processing.OutboundMessageWriter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import reactor.util.retry.Retry;
+
+import java.time.Duration;
 
 
 public class Main {
@@ -33,10 +36,11 @@ public class Main {
         final OutboundMessageWriter outboundMessageSerializer = new DefaultOutboundMessageWriter(new DefaultWarehouseMessageSerializer());
         final SensorMessageProcessor sensorMessageProcessor = new DefaultSensorMessageProcessor(sensorMessageDeserializer, outboundMessageSerializer, configProvider);
         final MessagePublisher messagePublisher = new KafkaPublisher(configProvider);
+        final Retry retryPolicy = Retry.backoff(5, Duration.ofMillis(200));
 
         log.info("Initialization completed");
 
-        new SensorMessagePipeline(sensorMessageSourceFactory, sensorMessageProcessor, messagePublisher)
+        new SensorMessagePipeline(sensorMessageSourceFactory, sensorMessageProcessor, messagePublisher, retryPolicy)
                 .runPipeline();
     }
 }

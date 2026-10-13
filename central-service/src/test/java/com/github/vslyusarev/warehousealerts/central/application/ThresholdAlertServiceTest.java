@@ -15,9 +15,9 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 class ThresholdAlertServiceTest {
-    final static int THRESHOLD = 35;
-    final static int VALUE_UNDER_THRESHOLD = THRESHOLD - 1;
-    final static int VALUE_ABOVE_THRESHOLD = THRESHOLD + 1;
+    private static final int THRESHOLD = 35;
+    private static final int VALUE_UNDER_THRESHOLD = THRESHOLD - 1;
+    private static final int VALUE_ABOVE_THRESHOLD = THRESHOLD + 1;
 
     private static SensorEvent getTemperatureEvent(int temperature) {
         return new SensorEvent(

@@ -12,10 +12,10 @@ import java.util.concurrent.Executors;
 import static org.junit.jupiter.api.Assertions.*;
 
 class InMemorySensorsStateTest {
-    private final String WAREHOUSE_ID = "w1";
-    private final String OTHER_WAREHOUSE_ID = "w2";
-    private final String SENSOR_ID = "t1";
-    private final String OTHER_SENSOR_ID = "h1";
+    private static final String WAREHOUSE_ID = "w1";
+    private static final String OTHER_WAREHOUSE_ID = "w2";
+    private static final String SENSOR_ID = "t1";
+    private static final String OTHER_SENSOR_ID = "h1";
 
     @Test
     void testNoPreviousState() {

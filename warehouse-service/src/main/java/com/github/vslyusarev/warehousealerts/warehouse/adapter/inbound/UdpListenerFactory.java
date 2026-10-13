@@ -1,8 +1,10 @@
 package com.github.vslyusarev.warehousealerts.warehouse.adapter.inbound;
 
 import com.github.vslyusarev.warehousealerts.shared.contracts.SensorType;
+import com.github.vslyusarev.warehousealerts.warehouse.application.model.input.SensorMessage;
 import com.github.vslyusarev.warehousealerts.warehouse.streaming.input.SensorMessageSource;
 import com.github.vslyusarev.warehousealerts.warehouse.streaming.input.SensorMessageSourceFactory;
+import org.reactivestreams.Publisher;
 
 public class UdpListenerFactory implements SensorMessageSourceFactory {
     private final UdpConfigProvider configProvider;
