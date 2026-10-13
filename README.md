@@ -1,6 +1,6 @@
 # warehouse_alerts
 
-A monitoring platform build with Java 21, Project Reactor and Apache Kafka.
+A monitoring platform built with Java 21, Project Reactor and Apache Kafka.
 
 ## Overview
 - **[warehouse-service](./warehouse-service/)** - listens to UDP for sensor measurements and publishes sensor events to Kafka
