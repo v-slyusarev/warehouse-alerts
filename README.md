@@ -25,7 +25,7 @@ Sensor messages can be simulated using any utility capable of sending UDP messag
 ``` shell
 echo -n "sensor_id=t1; value=100" | nc -u 127.0.0.1 3344 -w 0
 ```
-Alerts will appear in the stdout of ``. Watch it using:
+Alerts will appear in the stdout of `warehouse-alerts-central-service-1`. Watch it using:
 ``` shell
 docker logs warehouse-alerts-central-service-1 -f
 ```
